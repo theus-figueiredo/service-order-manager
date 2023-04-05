@@ -11,4 +11,5 @@ class CostCenterModel(Settings.DB_BASE_MODEL):
     name=Column(String(256), nullable=False)
     cnpj=Column(String(16), nullable=False)
     monthly_budget=Column(Float(precision=2))
+    #users = relationship('UserModel', back_populates='cost_centers', lazy='joined')
     
