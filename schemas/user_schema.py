@@ -20,7 +20,7 @@ class UserCreateSchema(UserBaseSchema):
 
 
 class UserRoleSchema(UserBaseSchema):
-    role: Optional[List[RoleSchema]]
+    role: Optional[RoleSchema]
 
 
 class UserUpdateSchema(UserBaseSchema):
