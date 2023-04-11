@@ -26,6 +26,7 @@ class UserRoleSchema(UserBaseSchema):
 class UserUpdateSchema(UserBaseSchema):
     fullname: Optional[str]
     email: Optional[str]
+    password: Optional[str]
     cpf: Optional[str]
     address: Optional[str]
     is_admin: Optional[bool]

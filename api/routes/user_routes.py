@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from models.user_model import UserModel
-from models.role_model import RoleModel
 from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserRoleSchema, UserUpdateSchema
 from core.dependencies import get_session, validate_access_token
 from core.security import password_hash_generate
@@ -111,7 +110,7 @@ async def delete_user(id: int, db: AsyncSession = Depends(get_session), user: Us
 
 #LOGIN
 @user_router.post('/', status_code=status.HTTP_202_ACCEPTED, response_model=str)
-async def loginn(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_session)) -> Response:
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_session)) -> Response:
     
     user = await authenticate_user(email=form_data.username, password=form_data.password, db=db)
     
@@ -121,4 +120,22 @@ async def loginn(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSess
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email ou senha inválidos')
 
 
-#
+#UPDATE PASSWORD
+@user_router.patch('/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=UserRoleSchema)
+async def update_password(id: int, data: UserCreateSchema, db: AsyncSession = Depends(get_session), user: UserModel = Depends(validate_access_token)) -> Response:
+    
+    async with db as database:
+        query = await database.execute(select(UserModel).filter(UserModel.id == id))
+        user_to_update = query.scalars().unique().one_or_none()
+        
+        if user_to_update:
+            if user_to_update.id == user.id or user.is_admin is True:
+                user_to_update.password == password_hash_generate(data.password)
+                await database.commit()
+                
+                return user_to_update
+                
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Ação não autorizada')
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
