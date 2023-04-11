@@ -1,10 +1,124 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List
 
 from models.user_model import UserModel
 from models.role_model import RoleModel
 from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserRoleSchema, UserUpdateSchema
-from core.dependencies import get_session
+from core.dependencies import get_session, validate_access_token
+from core.security import password_hash_generate
+from core.autentication import authenticate_user, generate_access_token
 
 user_router = APIRouter()
+
+#POST
+@user_router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserBaseSchema)
+async def post_user(data: UserCreateSchema, db: AsyncSession = Depends(get_session)) -> Response:
+    
+    async with db as database: 
+        try:   
+            new_user = UserModel(
+                fullname=data.fullname,
+                email=data.email,
+                password=password_hash_generate(data.password),
+                cpf=data.cpf,
+                address=data.address,
+                is_admin=data.is_admin
+            )
+            
+            database.add(new_user)
+            await database.commit()
+
+        except IntegrityError:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Email já cadastrado')
+
+
+#GET ALL
+@user_router.get('/', status_code=status.HTTP_200_OK, response_model=List[UserRoleSchema])
+async def get_all(db: AsyncSession = Depends(get_session)) -> Response:
+    
+    async with db as database:
+        
+        query = await database.execute(select(UserModel))
+        users: List[UserRoleSchema] = query.scalars().all()
+        
+        return users
+
+
+#GET BY ID
+@user_router.get('/{id}', status_code=status.HTTP_200_OK, response_model=UserRoleSchema)
+async def get_by_id(id: int, db: AsyncSession = Depends(get_session)) -> Response:
+    
+    async with db as database:
+        
+        query = await database.execute(select(UserModel).filter(UserModel.id == id))
+        user = query.scalars().unique().one_or_none()
+        
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
+        else:
+            return user
+
+
+#UPDATE USER
+@user_router.patch('/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=UserRoleSchema)
+async def update_user(id: int, data: UserUpdateSchema, db: AsyncSession = Depends(get_session), user: UserModel = Depends(validate_access_token)) -> Response:
+
+    async with db as database:
+        
+        query = await database.execute(select(UserModel).filter(UserModel.id == id))
+        user_to_update = query.scalars().unique().one_or_none()
+        
+        if user_to_update:
+            if user_to_update.id == user.id or user.is_admin is True:
+                
+                for key, value in data.dict(exclude_unset=True).items():
+                    setattr(user_to_update, key, value)
+
+                    await database.commit()
+                
+                return user_to_update
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Ação não autorizado')
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
+
+
+#DELETE USER
+@user_router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(id: int, db: AsyncSession = Depends(get_session), user: UserModel = Depends(validate_access_token)) -> None:
+    
+    async with db as database:
+        
+        query = await database.execute(select(UserModel).filter(UserModel.id == id))
+        user_to_delete = query.scalars().unique().one_or_none()
+        
+        if user_to_delete:
+            
+            if user_to_delete.id == user.id or user.is_admin is True:
+                await database.delete(user_to_delete)
+                await database.commit()
+                
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Ação não autorizada')
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
+
+
+#LOGIN
+@user_router.post('/', status_code=status.HTTP_202_ACCEPTED, response_model=str)
+async def loginn(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_session)) -> Response:
+    
+    user = await authenticate_user(email=form_data.username, password=form_data.password, db=db)
+    
+    if user:
+        return JSONResponse(content={"access_token": generate_access_token(sub=user.id), "token_type": "bearer"}, status_code=status.HTTP_200_OK)
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email ou senha inválidos')
+
+
+#
