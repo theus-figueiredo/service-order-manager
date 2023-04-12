@@ -33,7 +33,7 @@ async def post_user(data: UserCreateSchema, db: AsyncSession = Depends(get_sessi
             await database.commit()
 
         except IntegrityError:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Email já cadastrado')
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Email ou CPF já cadastrados')
 
 
 #GET ALL
@@ -110,7 +110,7 @@ async def delete_user(id: int, db: AsyncSession = Depends(get_session), user: Us
 
 #LOGIN
 @user_router.post('/login')
-async def login(login_data: UserUpdateSchema, db: AsyncSession = Depends(get_session)):
+async def login(login_data: UserUpdateSchema, db: AsyncSession = Depends(get_session)) -> Response:
     
     user = await authenticate_user(email=login_data.email, password=login_data.password, db=db)
     

@@ -10,6 +10,7 @@ class UserBaseSchema(BaseModel):
     cpf: str
     address: str
     is_admin: Optional[bool] = False
+    role_id: Optional[int] = None
     
     class Config:
         orm_mode = True
@@ -30,3 +31,4 @@ class UserUpdateSchema(UserBaseSchema):
     cpf: Optional[str]
     address: Optional[str]
     is_admin: Optional[bool]
+    role_id: Optional[int]

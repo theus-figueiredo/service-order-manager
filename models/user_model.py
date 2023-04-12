@@ -15,7 +15,7 @@ class UserModel(Settings.DB_BASE_MODEL):
     address=Column(String(256), nullable=False)
     password=Column(String(256), nullable=False)
     is_admin=Column(Boolean, default=False)
-    role_id=Column(Integer, ForeignKey('roles.id'), nullable=True)
+    role_id=Column(Integer, ForeignKey('roles.id'), nullable=True, default=None)
     role=relationship('RoleModel', cascade='all', lazy='joined', back_populates='users')
 
 
