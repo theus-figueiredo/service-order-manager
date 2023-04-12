@@ -1,15 +1,16 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, InternalError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from models.user_model import UserModel
-from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserRoleSchema, UserUpdateSchema
+from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserUpdateSchema, UserReturnSchema
 from core.dependencies import get_session, validate_access_token
 from core.security import password_hash_generate
 from core.autentication import authenticate_user, generate_access_token
+
 
 user_router = APIRouter()
 
@@ -25,30 +26,33 @@ async def post_user(data: UserCreateSchema, db: AsyncSession = Depends(get_sessi
                 password=password_hash_generate(data.password),
                 cpf=data.cpf,
                 address=data.address,
-                is_admin=data.is_admin
+                is_admin=data.is_admin,
+                role_id=(data.role_id or None)
             )
             
             database.add(new_user)
             await database.commit()
+            
+            return new_user
 
         except IntegrityError:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Email ou CPF já cadastrados')
 
 
 #GET ALL
-@user_router.get('/', status_code=status.HTTP_200_OK, response_model=List[UserRoleSchema])
+@user_router.get('/', status_code=status.HTTP_200_OK, response_model=List[UserReturnSchema])
 async def get_all(db: AsyncSession = Depends(get_session)) -> Response:
     
     async with db as database:
         
         query = await database.execute(select(UserModel))
-        users: List[UserRoleSchema] = query.scalars().all()
+        users: List[UserReturnSchema] = query.scalars().all()
         
         return users
 
 
 #GET BY ID
-@user_router.get('/{id}', status_code=status.HTTP_200_OK, response_model=UserRoleSchema)
+@user_router.get('/{id}', status_code=status.HTTP_200_OK, response_model=UserReturnSchema)
 async def get_by_id(id: int, db: AsyncSession = Depends(get_session)) -> Response:
     
     async with db as database:
@@ -63,7 +67,7 @@ async def get_by_id(id: int, db: AsyncSession = Depends(get_session)) -> Respons
 
 
 #UPDATE USER
-@user_router.patch('/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=UserRoleSchema)
+@user_router.patch('/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=UserReturnSchema)
 async def update_user(id: int, data: UserUpdateSchema, db: AsyncSession = Depends(get_session), user: UserModel = Depends(validate_access_token)) -> Response:
 
     async with db as database:
@@ -120,7 +124,7 @@ async def login(login_data: UserUpdateSchema, db: AsyncSession = Depends(get_ses
 
 
 #UPDATE PASSWORD
-@user_router.patch('/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=UserRoleSchema)
+@user_router.patch('/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=UserReturnSchema)
 async def update_password(id: int, data: UserCreateSchema, db: AsyncSession = Depends(get_session), user: UserModel = Depends(validate_access_token)) -> Response:
     
     async with db as database:
