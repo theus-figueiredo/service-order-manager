@@ -9,7 +9,7 @@ class UserBaseSchema(BaseModel):
     email: str
     cpf: str
     address: str
-    is_admin: bool
+    is_admin: Optional[bool] = False
     
     class Config:
         orm_mode = True
@@ -30,4 +30,3 @@ class UserUpdateSchema(UserBaseSchema):
     cpf: Optional[str]
     address: Optional[str]
     is_admin: Optional[bool]
-

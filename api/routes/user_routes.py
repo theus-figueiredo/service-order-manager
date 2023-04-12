@@ -109,15 +109,15 @@ async def delete_user(id: int, db: AsyncSession = Depends(get_session), user: Us
 
 
 #LOGIN
-@user_router.post('/', status_code=status.HTTP_202_ACCEPTED, response_model=str)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_session)) -> Response:
+@user_router.post('/login')
+async def login(login_data: UserUpdateSchema, db: AsyncSession = Depends(get_session)):
     
-    user = await authenticate_user(email=form_data.username, password=form_data.password, db=db)
+    user = await authenticate_user(email=login_data.email, password=login_data.password, db=db)
     
-    if user:
-        return JSONResponse(content={"access_token": generate_access_token(sub=user.id), "token_type": "bearer"}, status_code=status.HTTP_200_OK)
-    else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email ou senha inválidos')
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email ou senha incorretos')
+    
+    return JSONResponse(content={"access_token": generate_access_token(sub=user.id), "token_type": "bearer"}, status_code=status.HTTP_200_OK)
 
 
 #UPDATE PASSWORD

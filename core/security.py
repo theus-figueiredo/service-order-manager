@@ -8,4 +8,3 @@ def password_hash_generate(password: str) -> str:
 
 def validate_password(password: str, hash_password: str) -> bool:
     return CRIPTO.verify(password, hash_password)
-

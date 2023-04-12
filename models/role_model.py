@@ -9,3 +9,4 @@ class RoleModel(Settings.DB_BASE_MODEL):
     
     id=Column(Integer, primary_key=True, autoincrement=True)
     role=Column(String(24), unique=True)
+    users=relationship('UserModel', back_populates='role')

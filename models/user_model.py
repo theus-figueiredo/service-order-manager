@@ -11,11 +11,12 @@ class UserModel(Settings.DB_BASE_MODEL):
     id = Column(Integer, primary_key=True, autoincrement=True)
     fullname = Column(String(256), nullable=False)
     email = Column(String(256), unique=True, nullable=False)
-    cpf=Column(String(16), nullable=False)
+    cpf=Column(String(16), nullable=False, unique=True)
     address=Column(String(256), nullable=False)
     password=Column(String(256), nullable=False)
     is_admin=Column(Boolean, default=False)
-    role=relationship('RoleModel', cascade='all', lazy='joined')
+    role_id=Column(Integer, ForeignKey('roles.id'), nullable=True)
+    role=relationship('RoleModel', cascade='all', lazy='joined', back_populates='users')
 
 
 

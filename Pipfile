@@ -14,6 +14,7 @@ passlib = "*"
 uvicorn = "*"
 python-multipart = "*"
 python-jose = {extras = ["criptography"], version = "*"}
+pytz = "*"
 
 [dev-packages]
 
