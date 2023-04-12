@@ -75,3 +75,23 @@ async def update_role(id: int, data: RoleSchema, db: AsyncSession = Depends(get_
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Usuário não autorizado')
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Posição não enconrada')
+
+
+#DELETE ROLE
+@role_router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_role(id: int, db: AsyncSession = Depends(get_session), user: UserModel = Depends(validate_access_token)) -> None:
+    
+    async with db as database:
+        query = await database.execute(select(RoleModel).filter(RoleModel.id == id))
+        role_to_delete = query.scalars().unique().one_or_none()
+        
+        if role_to_delete:
+            if user.is_admin is True:
+                
+                await database.delete(role_to_delete)
+                await database.commit()
+                
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Usuário não autorizado')
+        else:
+            raise HTTPException(status_code=status, detail='Posição não encontrada')
