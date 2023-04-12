@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response
 from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession

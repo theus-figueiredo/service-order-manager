@@ -17,9 +17,5 @@ class UserModel(Settings.DB_BASE_MODEL):
     is_admin=Column(Boolean, default=False)
     role_id=Column(Integer, ForeignKey('roles.id'), nullable=True, default=None)
     role=relationship('RoleModel', cascade='all', lazy='joined', back_populates='users')
-
-
-
-    #cost_center_ids=Column(List[Integer], nullable=True, ForeignKey='cost_center.id')
-    #cost_center=relationship('CostCenterModel', cascade='all', back_populates='users', uselist=True, lazy='joined')
-    
+    cost_center_ids=Column(List[Integer], nullable=True, ForeignKey='cost_center.id')
+    cost_center=relationship('CostCenterModel', cascade='all', back_populates='users', uselist=True, lazy='joined', secondary='costcenter_user')

@@ -11,6 +11,7 @@ class UserBaseSchema(BaseModel):
     address: str
     is_admin: Optional[bool] = False
     role_id: Optional[int] = None
+    cost_center_ids: Optional[List[int]]
     
     class Config:
         orm_mode = True
@@ -32,3 +33,4 @@ class UserUpdateSchema(UserBaseSchema):
     address: Optional[str]
     is_admin: Optional[bool]
     role_id: Optional[int]
+    cost_center_ids: Optional[List[int]]
