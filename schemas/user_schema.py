@@ -2,6 +2,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from schemas.role_schema import RoleSchema
+from schemas.cost_center_schema import CostCenterBaseSchema
 
 class UserBaseSchema(BaseModel):
     id: Optional[int]
@@ -11,6 +12,7 @@ class UserBaseSchema(BaseModel):
     address: str
     is_admin: Optional[bool] = False
     role_id: Optional[int] = None
+    cost_center_ids: Optional[int] = None
     
     class Config:
         orm_mode = True
@@ -19,6 +21,8 @@ class UserBaseSchema(BaseModel):
 class UserCreateSchema(UserBaseSchema):
     password: str
 
+    class Config:
+        orm_mode = True
 
 class UserUpdateSchema(UserBaseSchema):
     fullname: Optional[str]
@@ -28,11 +32,22 @@ class UserUpdateSchema(UserBaseSchema):
     address: Optional[str]
     is_admin: Optional[bool]
     role_id: Optional[int]
+    cost_center_ids: Optional[List[int]]
+    
+    class Config:
+        orm_mode = True
     
 
 class UserReturnSchema(UserBaseSchema):
     role: Optional[RoleSchema]
+    cost_centers: Optional[List[CostCenterBaseSchema]]
+    
+    class Config:
+        orm_mode = True
 
 
-class UserAddCostCenterSchema(UserBaseSchema):
+class UserUpdateCostCenterSchema(UserBaseSchema):
     cost_center_id: int
+    
+    class Config:
+        orm_mode = True

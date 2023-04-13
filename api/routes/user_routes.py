@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from models.user_model import UserModel
-from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserUpdateSchema, UserReturnSchema
 from core.dependencies import get_session, validate_access_token
 from core.security import password_hash_generate
 from core.autentication import authenticate_user, generate_access_token
+from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserUpdateSchema, UserReturnSchema, UserUpdateCostCenterSchema
 
 
 user_router = APIRouter()
@@ -27,7 +27,8 @@ async def post_user(data: UserCreateSchema, db: AsyncSession = Depends(get_sessi
                 cpf=data.cpf,
                 address=data.address,
                 is_admin=data.is_admin,
-                role_id=(data.role_id or None)
+                role_id=None,
+                cost_center_ids=None
             )
             
             database.add(new_user)
@@ -46,7 +47,7 @@ async def get_all(db: AsyncSession = Depends(get_session)) -> Response:
     async with db as database:
         
         query = await database.execute(select(UserModel))
-        users: List[UserReturnSchema] = query.scalars().all()
+        users: List[UserReturnSchema] = query.scalars().unique().all()
         
         return users
 
