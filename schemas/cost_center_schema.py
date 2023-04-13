@@ -7,6 +7,9 @@ class CostCenterBaseSchema(BaseModel):
     address: str
     director: str
     contact: str
+    
+    class Config:
+        orm_mode = True
 
 
 class CostCenterUpdateSchema(CostCenterBaseSchema):
@@ -14,4 +17,8 @@ class CostCenterUpdateSchema(CostCenterBaseSchema):
     address: Optional[str]
     director: Optional[str]
     contact: Optional[str]
+    
+    class Config:
+        orm_mode = True
+
 
