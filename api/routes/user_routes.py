@@ -1,15 +1,17 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import IntegrityError, InternalError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from models.user_model import UserModel
+from models.user_model import UserModel, UserCostcenter
+from models.cost_center_model import CostCenterModel
 from core.dependencies import get_session, validate_access_token
 from core.security import password_hash_generate
 from core.autentication import authenticate_user, generate_access_token
-from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserUpdateSchema, UserReturnSchema, UserUpdateCostCenterSchema
+from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserUpdateSchema, UserReturnSchema
+from schemas.relationships_schema import UserCostcenterBaseSchema
 
 
 user_router = APIRouter()
@@ -28,7 +30,6 @@ async def post_user(data: UserCreateSchema, db: AsyncSession = Depends(get_sessi
                 address=data.address,
                 is_admin=data.is_admin,
                 role_id=None,
-                cost_center_ids=None
             )
             
             database.add(new_user)
@@ -143,3 +144,25 @@ async def update_password(id: int, data: UserCreateSchema, db: AsyncSession = De
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Ação não autorizada')
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
+
+
+#ADD COST CENTER:
+@user_router.post('/{id}/cost-center', status_code=status.HTTP_202_ACCEPTED, response_model=UserReturnSchema)
+async def add_cost_center(id: int, data: UserCostcenterBaseSchema, db: AsyncSession = Depends(get_session)) -> Response:
+    
+    async with db as database:
+        query = await database.execute(select(UserModel).filter(UserModel.id == id))
+        user_to_update = query.scalars().unique().one_or_none()
+        
+        query2 = await database.execute(select(CostCenterModel).filter(CostCenterModel.id == data.costcenter_id))
+        cost_center = query2.scalars().unique().one_or_none()
+        
+        if user_to_update is not None and cost_center is not None:
+            new_user_costcenter = UserCostcenter(user_id=user_to_update.id, costcenter_id=data.costcenter_id)
+            database.add(new_user_costcenter)
+            
+            await database.commit()
+            return user_to_update
+        
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário ou Unidade não encontrado(a)')

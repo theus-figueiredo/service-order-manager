@@ -15,6 +15,16 @@ class UserModel(Settings.DB_BASE_MODEL):
     password=Column(String(256))
     is_admin=Column(Boolean, default=False)
     role_id=Column(Integer, ForeignKey('roles.id'), default=None)
-    cost_center_ids=Column(Integer, ForeignKey('costcenter.id'), default=None)
+    #cost_center_ids=Column(Integer, ForeignKey('costcenter.id'), default=None)
     role=relationship('RoleModel', cascade='all', lazy='joined', back_populates='users')
-    cost_centers=relationship('CostCenterModel', lazy='joined', back_populates='users', uselist=True)
+    cost_centers=relationship('CostCenterModel', lazy='joined', back_populates='users', uselist=True, secondary='user_costcenter')
+
+
+
+class UserCostcenter(Settings.DB_BASE_MODEL):
+    __tablename__ = 'user_costcenter'
+    __allow_unmapped__ = True
+    
+    user_id=Column(Integer, ForeignKey('users.id'), primary_key=True)
+    costcenter_id=Column(Integer, ForeignKey('costcenter.id'), primary_key=True)
+

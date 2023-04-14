@@ -10,9 +10,8 @@ class UserBaseSchema(BaseModel):
     email: str
     cpf: str
     address: str
-    is_admin: Optional[bool] = False
-    role_id: Optional[int] = None
-    cost_center_ids: Optional[int] = None
+    is_admin: Optional[bool]
+    role_id: Optional[int]
     
     class Config:
         orm_mode = True
@@ -32,7 +31,8 @@ class UserUpdateSchema(UserBaseSchema):
     address: Optional[str]
     is_admin: Optional[bool]
     role_id: Optional[int]
-    cost_center_ids: Optional[List[int]]
+    role: Optional[RoleSchema]
+    cost_centers: Optional[List[CostCenterBaseSchema]]
     
     class Config:
         orm_mode = True
@@ -47,7 +47,13 @@ class UserReturnSchema(UserBaseSchema):
 
 
 class UserUpdateCostCenterSchema(UserBaseSchema):
-    cost_center_id: int
+    fullname: Optional[str]
+    email: Optional[str]
+    password: Optional[str]
+    cpf: Optional[str]
+    address: Optional[str]
+    is_admin: Optional[bool]
+    role_id: Optional[int]
     
     class Config:
         orm_mode = True
