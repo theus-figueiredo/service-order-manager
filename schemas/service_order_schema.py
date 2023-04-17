@@ -33,6 +33,7 @@ class ServiceOrderUpdateSchema(ServiceOrderBaseSchema):
 class ServiceOrderReturnSchema(ServiceOrderBaseSchema):
     identifier: Optional[str]
     description: Optional[str]
+    created_at: Optional[datetime]
     status: Optional[ServiceStatusSchema]
     cost_center: Optional[CostCenterBaseSchema]
     execution_value: Optional[float]

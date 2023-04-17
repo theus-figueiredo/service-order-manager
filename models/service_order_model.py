@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from core.configs import Settings
@@ -10,6 +10,7 @@ class ServiceOrderModel(Settings.DB_BASE_MODEL):
     id = Column(Integer, primary_key=True, autoincrement=True)
     identifier = Column(String(16))
     description = Column(String(256))
+    created_at = Column(DateTime)
     execution_value = Column(Float, nullable=True)
     charged_value = Column(Float, nullable=True)
     status_id = Column(Integer, ForeignKey('service_status.id'))
