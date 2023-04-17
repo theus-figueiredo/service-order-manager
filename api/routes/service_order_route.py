@@ -7,27 +7,30 @@ from pytz import timezone
 
 from core.dependencies import get_session, validate_access_token
 from models.service_order_model import ServiceOrderModel
-from schemas.service_order_schema import ServiceOrderBaseSchema, ServiceOrderReturnSchema, ServiceOrderUpdateSchema
+from schemas.service_order_schema import ServiceOrderReturnSchema, ServiceOrderUpdateSchema, ServiceOrderBaseSchema
 
 service_order_router = APIRouter()
 
 
 #POST
-@service_order_router.post('/', status_code=status.HTTP_201_CREATED, response_model=ServiceOrderReturnSchema)
-async def post(data: ServiceOrderUpdateSchema,db: AsyncSession = Depends(get_session)) -> Response:
+@service_order_router.post('/', status_code=status.HTTP_201_CREATED, response_model=ServiceOrderBaseSchema)
+async def post(data: ServiceOrderUpdateSchema, db: AsyncSession = Depends(get_session)) -> Response:
     
-    new_service_order = ServiceOrderModel(
-        identifier=data.identifier,
-        description=data.description,
-        creation_date=datetime.now(tz=timezone('America/Sao_Paulo')),
-        status_id=data.status_id,
-        cost_center_id=data.cost_center_id
-    )
+    async with db as database:
+
+        new_service_order = ServiceOrderModel(
+            identifier=data.identifier,
+            description=data.description,
+            execution_value=None,
+            charged_value=None,
+            status_id=data.status_id,
+            cost_center_id=data.cost_center_id
+        )
     
-    db.add(new_service_order)
-    await db.commit()
+        database.add(new_service_order)
+        await database.commit()
     
-    return new_service_order
+        return new_service_order
 
 
 #GET ALL

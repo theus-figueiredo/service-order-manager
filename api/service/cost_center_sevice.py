@@ -12,7 +12,7 @@ async def get_all_cost_centers(db: AsyncSession = Depends(get_session)):
     
     async with db as database:
         query = await database.execute(select(CostCenterModel))
-        return query.scalars().all()
+        return query.scalars().unique().all()
 
 
 #GET COST-CENTER BY ID:
