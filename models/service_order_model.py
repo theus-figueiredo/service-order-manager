@@ -17,3 +17,5 @@ class ServiceOrderModel(Settings.DB_BASE_MODEL):
     status = relationship('ServiceStatusModel', lazy='joined', back_populates='service_orders')
     cost_center_id = Column(Integer, ForeignKey('costcenter.id'))
     cost_center = relationship('CostCenterModel', lazy='joined', back_populates='service_orders')
+    category_id = Column(Integer, ForeignKey('service_category.id'))
+    category = relationship('ServiceCategoryModel', lazy='joined', back_populates='service_orders')

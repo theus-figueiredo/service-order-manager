@@ -3,7 +3,6 @@ from sqlalchemy.future import select
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
-from pytz import timezone
 
 from core.dependencies import get_session, validate_access_token
 from models.service_order_model import ServiceOrderModel
@@ -25,12 +24,13 @@ async def post(data: ServiceOrderUpdateSchema, db: AsyncSession = Depends(get_se
             execution_value=None,
             charged_value=None,
             status_id=data.status_id,
-            cost_center_id=data.cost_center_id
+            cost_center_id=data.cost_center_id,
+            category_id=data.category_id
         )
     
         database.add(new_service_order)
         await database.commit()
-        await database.refresh(new_service_order, ['status', 'cost_center'])
+        await database.refresh(new_service_order, ['status', 'cost_center', 'category'])
     
         return new_service_order
 
