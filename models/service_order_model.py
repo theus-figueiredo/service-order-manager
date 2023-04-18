@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from core.configs import Settings
+from models.book_model import BookModel
 
 class ServiceOrderModel(Settings.DB_BASE_MODEL):
     __tablename__ = 'service_order'

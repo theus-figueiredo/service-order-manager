@@ -7,6 +7,7 @@ from api.routes.service_category_route import service_category_router
 from api.routes.service_status_route import service_status_router
 from api.routes.service_order_route import service_order_router
 from api.routes.comment_route import comment_router
+from api.routes.book_router import book_router
 
 api_router = APIRouter()
 
@@ -17,3 +18,4 @@ api_router.include_router(router=service_category_router, prefix='/service-categ
 api_router.include_router(router=service_status_router, prefix='/service-status', tags=['Service Status'])
 api_router.include_router(router=service_order_router, prefix='/service-order', tags=['Service Order'])
 api_router.include_router(router=comment_router, prefix='/comments', tags=['Comments'])
+api_router.include_router(router=book_router, prefix='/books', tags=['Books'])
