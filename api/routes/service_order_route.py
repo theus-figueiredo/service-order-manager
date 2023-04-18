@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 
-from core.dependencies import get_session, validate_access_token
+from core.dependencies import get_session #validate_access_token
 from models.service_order_model import ServiceOrderModel
 from schemas.service_order_schema import ServiceOrderReturnSchema, ServiceOrderUpdateSchema
 

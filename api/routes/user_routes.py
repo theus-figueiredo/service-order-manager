@@ -83,7 +83,7 @@ async def update_user(id: int, data: UserUpdateSchema, db: AsyncSession = Depend
                 for key, value in data.dict(exclude_unset=True).items():
                     setattr(user_to_update, key, value)
 
-                    await database.commit()
+                await database.commit()
                 
                 return user_to_update
             else:

@@ -4,3 +4,4 @@ from models.cost_center_model import CostCenterModel
 from models.service_category_model import ServiceCategoryModel
 from models.service_status_model import ServiceStatusModel
 from models.service_order_model import ServiceOrderModel
+from models.comment_model import CommentModel
