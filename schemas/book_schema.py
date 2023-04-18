@@ -10,7 +10,7 @@ class BookBaseSchema(BaseModel):
     id: Optional[int]
     description: str
     paied: bool
-    created_at: datetime
+    created_at: Optional[datetime]
     value: float
     cost_center_id: int
 
