@@ -20,3 +20,6 @@ class ServiceOrderModel(Settings.DB_BASE_MODEL):
     category_id = Column(Integer, ForeignKey('service_category.id'))
     category = relationship('ServiceCategoryModel', lazy='joined', back_populates='service_orders')
     comments = relationship('CommentModel', lazy='joined', back_populates='service_order', uselist=True)
+    book_id = Column(Integer, ForeignKey('books.id'), nullable=True)
+    book = relationship('BookModel', lazy='joined', back_populates='service_orders')
+

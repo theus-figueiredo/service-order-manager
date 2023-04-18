@@ -14,3 +14,4 @@ class CostCenterModel(Settings.DB_BASE_MODEL):
     contact=Column(String(64))
     users=relationship('UserModel', back_populates='cost_centers', cascade='all', secondary='user_costcenter', uselist=True)
     service_orders=relationship('ServiceOrderModel', back_populates='cost_center', cascade='all', lazy='joined', uselist=True)
+    books = relationship('BookModel', lazy='joined', back_populates='cost_center', uselist=True, cascade='all')
