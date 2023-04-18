@@ -30,7 +30,7 @@ async def post(data: ServiceOrderUpdateSchema, db: AsyncSession = Depends(get_se
     
         database.add(new_service_order)
         await database.commit()
-        await database.refresh(new_service_order, ['status', 'cost_center', 'category'])
+        await database.refresh(new_service_order, ['status', 'cost_center', 'category', 'comments'])
     
         return new_service_order
 

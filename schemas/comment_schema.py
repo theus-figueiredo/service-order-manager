@@ -2,8 +2,7 @@ from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime
 
-from schemas.service_order_schema import ServiceOrderReturnSchema
-from schemas.user_schema import UserReturnSchema
+from schemas.user_schema import UserBaseSchema
 
 class CommentBaseSchema(BaseModel):
     
@@ -28,6 +27,13 @@ class CommentUpdateSchema(CommentBaseSchema):
 class CommentReturnSchema(CommentBaseSchema):
     id: int
     comment: str
-    posted_at: int
-    user: UserReturnSchema
-    service_order: ServiceOrderReturnSchema
+    posted_at: datetime
+    user_id: Optional[int]
+    service_order_id: Optional[int]
+
+
+class Comment_ServiceOrderSchema(CommentBaseSchema):
+    id: Optional[int]
+    comment: str
+    user_id: int
+    user: UserBaseSchema

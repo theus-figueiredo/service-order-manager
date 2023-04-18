@@ -1,10 +1,12 @@
 from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime
+from typing import List
 
 from schemas.service_status_schema import ServiceStatusSchema
 from schemas.cost_center_schema import CostCenterBaseSchema
 from schemas.service_category_schema import ServiceCategorySchema
+from schemas.comment_schema import CommentBaseSchema
 
 class ServiceOrderBaseSchema(BaseModel):
     id: Optional[int]
@@ -41,6 +43,7 @@ class ServiceOrderReturnSchema(ServiceOrderBaseSchema):
     category: Optional[ServiceCategorySchema]
     execution_value: Optional[float]
     charged_value: Optional[float]
+    comments: Optional[List[CommentBaseSchema]]
     
     class Config:
         orm_mode = True
