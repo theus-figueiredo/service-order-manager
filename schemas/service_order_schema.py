@@ -7,6 +7,7 @@ from schemas.service_status_schema import ServiceStatusSchema
 from schemas.cost_center_schema import CostCenterBaseSchema
 from schemas.service_category_schema import ServiceCategorySchema
 from schemas.comment_schema import CommentBaseSchema
+from schemas.book_schema import BookBaseSchema
 
 class ServiceOrderBaseSchema(BaseModel):
     id: Optional[int]
@@ -29,6 +30,7 @@ class ServiceOrderUpdateSchema(ServiceOrderBaseSchema):
     category_id: Optional[int]
     execution_value: Optional[float]
     charged_value: Optional[float]
+    book_id: Optional[int]
 
     class Config:
         orm_mode = True
@@ -44,6 +46,7 @@ class ServiceOrderReturnSchema(ServiceOrderBaseSchema):
     execution_value: Optional[float]
     charged_value: Optional[float]
     comments: Optional[List[CommentBaseSchema]]
+    book: Optional[BookBaseSchema]
     
     class Config:
         orm_mode = True

@@ -4,7 +4,8 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 
-from core.dependencies import get_session #validate_access_token
+from core.dependencies import get_session, validate_access_token
+from models.user_model import UserModel
 from models.service_order_model import ServiceOrderModel
 from schemas.service_order_schema import ServiceOrderReturnSchema, ServiceOrderUpdateSchema
 
@@ -94,3 +95,40 @@ async def delete(id: int, db: AsyncSession = Depends(get_session)) -> Response:
         
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Ordem de Serviço não encontrada')
+
+
+
+#ADD ONE TO A BOOK
+@service_order_router.post('/{id}/add-livro', status_code=status.HTTP_202_ACCEPTED, response_model=ServiceOrderReturnSchema)
+async def add_to_book(id: int, data: ServiceOrderUpdateSchema, db: AsyncSession = Depends(get_session)) -> Response:
+    
+    async with db as database:
+        query = await database.execute(select(ServiceOrderModel).filter(ServiceOrderModel.id == id))
+        service_order = query.scalars().unique().one_or_none()
+        
+        if service_order:
+            service_order.book_id = data.book_id
+            await database.commit()
+            
+            return service_order
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Ordem de Serviço não encontrada')
+
+
+#ADD MULTIPLE SERVICE ORDERS TO A BOOK:
+#WILL POSSIBLY BE REMOVE SINCE DOES'T SEEM TO BE PERFORMATIC
+@service_order_router.post('/add-multiple-to-book', status_code=status.HTTP_202_ACCEPTED, response_model=bool)
+async def add_multiple_to_book(ids: List[int], new_book_id: int , db: AsyncSession = Depends(get_session)) -> Response:
+    
+    async with db as database:
+        
+        for id in ids:
+            query = await database.execute(select(ServiceOrderModel).filter(ServiceOrderModel.id == id))
+            SO = query.scalars().unique().one_or_none()
+            
+            if SO is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Alguma das Ordens de Serviço é inválida')
+            else:
+                SO.book_id = new_book_id
+                await database.commit()
+
