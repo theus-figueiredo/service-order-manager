@@ -15,4 +15,3 @@ class BookModel(Settings.DB_BASE_MODEL):
     cost_center_id = Column(Integer, ForeignKey('costcenter.id'))
     cost_center = relationship('CostCenterModel', lazy='joined', back_populates='books', cascade='all')
     service_orders = relationship('ServiceOrderModel', lazy='joined', back_populates='book', uselist=True)
-    
