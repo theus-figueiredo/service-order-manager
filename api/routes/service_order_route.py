@@ -99,7 +99,7 @@ async def delete(id: int, db: AsyncSession = Depends(get_session)) -> Response:
 
 
 #ADD ONE TO A BOOK
-@service_order_router.post('/{id}/add-livro', status_code=status.HTTP_202_ACCEPTED, response_model=ServiceOrderReturnSchema)
+@service_order_router.post('/{id}/add-book', status_code=status.HTTP_202_ACCEPTED, response_model=ServiceOrderReturnSchema)
 async def add_to_book(id: int, data: ServiceOrderUpdateSchema, db: AsyncSession = Depends(get_session)) -> Response:
     
     async with db as database:
@@ -107,8 +107,11 @@ async def add_to_book(id: int, data: ServiceOrderUpdateSchema, db: AsyncSession 
         service_order = query.scalars().unique().one_or_none()
         
         if service_order:
-            service_order.book_id = data.book_id
-            await database.commit()
+            if not data.book_id:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='dados do livro não informados')
+            else:
+                service_order.book_id = data.book_id
+                await database.commit()
             
             return service_order
         else:
