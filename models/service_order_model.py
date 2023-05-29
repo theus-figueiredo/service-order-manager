@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from core.configs import Settings
 from models.book_model import BookModel
+from models.service_priority_model import ServicePriorityModel
 
 class ServiceOrderModel(Settings.DB_BASE_MODEL):
     __tablename__ = 'service_order'
@@ -23,4 +24,5 @@ class ServiceOrderModel(Settings.DB_BASE_MODEL):
     comments = relationship('CommentModel', lazy='joined', back_populates='service_order', uselist=True)
     book_id = Column(Integer, ForeignKey('books.id'), nullable=True)
     book = relationship('BookModel', lazy='joined', back_populates='service_orders')
-
+    priority_id = Column(Integer, ForeignKey('service_priority.id'))
+    priority = relationship('ServicePriorityModel', lazy='joined', back_populates='service_orders', cascade='all')

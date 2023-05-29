@@ -10,7 +10,7 @@ from models.cost_center_model import CostCenterModel
 from core.dependencies import get_session, validate_access_token
 from core.security import password_hash_generate
 from core.autentication import authenticate_user, generate_access_token
-from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserUpdateSchema, UserReturnSchema
+from schemas.user_schema import UserBaseSchema, UserCreateSchema, UserUpdateSchema, UserReturnSchema, UserLoginSchema
 from schemas.relationships_schema import UserCostcenterBaseSchema
 
 
@@ -115,9 +115,10 @@ async def delete_user(id: int, db: AsyncSession = Depends(get_session), user: Us
 
 #LOGIN
 @user_router.post('/login')
-async def login(login_data: UserUpdateSchema, db: AsyncSession = Depends(get_session)) -> Response:
+async def login(data: UserLoginSchema, db: AsyncSession = Depends(get_session)) -> Response:
     
-    user = await authenticate_user(email=login_data.email, password=login_data.password, db=db)
+    print(data.email, data.password, flush=True)
+    user = await authenticate_user(email=data.email, password=data.password, db=db)
     
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email ou senha incorretos')

@@ -39,4 +39,3 @@ async def update_cost_center(id: int, data: CostCenterUpdateSchema, db: AsyncSes
                 await database.commit()
             
             return cost_center_to_update
- 

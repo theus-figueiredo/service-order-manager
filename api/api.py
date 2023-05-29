@@ -11,10 +11,10 @@ from api.routes.book_router import book_router
 
 api_router = APIRouter()
 
-api_router.include_router(router=user_router, prefix='/users', tags=['users'])
-api_router.include_router(router=role_router, prefix='/roles', tags=['roles'])
+api_router.include_router(router=user_router, prefix='/users', tags=['Users'])
+api_router.include_router(router=role_router, prefix='/roles', tags=['Roles'])
 api_router.include_router(router=costcenter_router, prefix='/cost-center', tags=['Cost center'])
-api_router.include_router(router=service_category_router, prefix='/service-category', tags=['service category'])
+api_router.include_router(router=service_category_router, prefix='/service-category', tags=['Service category'])
 api_router.include_router(router=service_status_router, prefix='/service-status', tags=['Service Status'])
 api_router.include_router(router=service_order_router, prefix='/service-order', tags=['Service Order'])
 api_router.include_router(router=comment_router, prefix='/comments', tags=['Comments'])
